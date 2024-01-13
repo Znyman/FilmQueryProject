@@ -36,7 +36,9 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 			statement = conn.prepareStatement(sqlQuery);
 			statement.setInt(1, filmId);
 			ResultSet results = statement.executeQuery();
-			film = constructFilm(results);
+			if (results.next()) {
+				film = constructFilm(results);
+			}
 			results.close();
 			statement.close();
 			conn.close();
@@ -46,7 +48,7 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 
 		return film;
 	}
-	
+
 	@Override
 	public List<Film> findFilmsByActorId(int actorId) {
 		List<Film> films = new ArrayList<>();
@@ -60,10 +62,9 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 			while (results.next()) {
 				Film film;
 				// DO NOT USE constructFilm() BECAUSE IT WILL RESULT IN RECURSIVE CALLS
-				film = new Film(results.getInt("id"), results.getString("title"),
-						results.getString("description"), results.getShort("release_year"),
-						results.getInt("language_id"), results.getInt("rental_duration"),
-						results.getDouble("rental_rate"), results.getInt("length"),
+				film = new Film(results.getInt("id"), results.getString("title"), results.getString("description"),
+						results.getShort("release_year"), results.getInt("language_id"),
+						results.getInt("rental_duration"), results.getDouble("rental_rate"), results.getInt("length"),
 						results.getDouble("replacement_cost"), results.getString("rating"),
 						results.getString("special_features"));
 				films.add(film);
@@ -76,11 +77,11 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 		}
 		return films;
 	}
-	
+
 	@Override
-	public Film findFilmByKeyword(String keyword) {
-		Film film = null;
-		
+	public List<Film> findFilmByKeyword(String keyword) {
+		List<Film> films = new ArrayList<>();
+
 		String sqlQuery = "SELECT * FROM film WHERE title LIKE ? OR description LIKE ?";
 		PreparedStatement statement;
 		try {
@@ -89,39 +90,40 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 			statement.setString(1, "%" + keyword + "%");
 			statement.setString(2, "%" + keyword + "%");
 			ResultSet results = statement.executeQuery();
-			film = constructFilm(results);
+			while (results.next()) {
+				Film film = constructFilm(results);
+				films.add(film);
+			}
 			statement.close();
 			conn.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
-		return film;
+
+		return films;
 	}
-	
+
 	private Film constructFilm(ResultSet results) {
 		Film film = null;
 		try {
-			if (results.next()) {
-				film = new Film(results.getInt("id"), results.getString("title"),
-						results.getString("description"), results.getShort("release_year"),
-						results.getInt("language_id"), results.getInt("rental_duration"),
-						results.getDouble("rental_rate"), results.getInt("length"),
-						results.getDouble("replacement_cost"), results.getString("rating"),
-						results.getString("special_features"), findActorsByFilmId(results.getInt("id")));
-				film.setLanguage(findFilmLanguage(results.getInt("id")));
-			}
+			film = new Film(results.getInt("id"), results.getString("title"), results.getString("description"),
+					results.getShort("release_year"), results.getInt("language_id"), results.getInt("rental_duration"),
+					results.getDouble("rental_rate"), results.getInt("length"), results.getDouble("replacement_cost"),
+					results.getString("rating"), results.getString("special_features"),
+					findActorsByFilmId(results.getInt("id")));
+			film.setLanguage(findFilmLanguage(results.getInt("id")));
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return film;
 	}
-	
+
 	private String findFilmLanguage(int filmID) {
 		String language = null;
-		//select language.name from language join film on film.language_id = language.id where film.id = 1;
-		
+		// select language.name from language join film on film.language_id =
+		// language.id where film.id = 1;
+
 		String sqlQuery = "SELECT language.name FROM language JOIN film ON film.language_id = language.id WHERE film.id = ?";
 		PreparedStatement statement;
 		try {
@@ -137,7 +139,7 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return language;
 	}
 

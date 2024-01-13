@@ -1,5 +1,7 @@
 package com.skilldistillery.filmquery.app;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import com.skilldistillery.filmquery.database.DatabaseAccessor;
@@ -33,6 +35,7 @@ public class FilmQueryApp {
 	private void startUserInterface(Scanner keyboard) {
 		int userChoice;
 		Film film = null;
+		List<Film> films = new ArrayList<>();
 		do {
 			System.out.println("Would you like to:");
 			System.out.println("'1' Look up a film by its ID");
@@ -51,8 +54,8 @@ public class FilmQueryApp {
 			case 2:
 				System.out.println("What is the keyword you would like to search films for?");
 				String keyword = keyboard.nextLine();
-				film = db.findFilmByKeyword(keyword);
-				displayFilmData(film);
+				films = db.findFilmByKeyword(keyword);
+				displayFilmData(films);
 				break;
 			case 3:
 				System.out.println("Goodbye.");
@@ -83,5 +86,31 @@ public class FilmQueryApp {
 			System.out.println();
 		}
 	}
+	
+	public void displayFilmData(List<Film> films) {
+		if (films.isEmpty()) {
+			System.out.println("I'm sorry, we couldn't find any films with that information.");
+		} else {
+			System.out.println("We have found " + films.size() + " films matching your keyword, and here is the information:");
+			int filmCounter = 0;
+			for (Film film : films) {
+				filmCounter++;
+				System.out.println("This is the " + filmCounter + " film with your keyword.");
+				System.out.println("Title: " + film.getTitle());
+				System.out.println("Year released: " + film.getReleaseYear());
+				System.out.println("Rating: " + film.getRating());
+				System.out.println("Description: " + film.getDescription());
+				System.out.println("Language: " + film.getLanguage());
+				System.out.println();
+				System.out.println("Starring:");
+				for (Actor actor : film.getActors()) {
+					System.out.println(actor.getFirstName() + " " + actor.getLastName());
+				}
+				System.out.println();
+			}
+		}
+	}
+	
+	
 
 }
