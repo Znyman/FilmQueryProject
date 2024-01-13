@@ -16,6 +16,7 @@ public class Film {
 	String rating;
 	String specialFeatures;
 	List<Actor> actors;
+	String language;
 
 	public Film(int id, String title, String description, short releaseYear, int languageID, int rentalDuration,
 			double rentalRate, int length, double replacementCost, String rating, String specialFeatures) {
@@ -137,9 +138,17 @@ public class Film {
 		this.actors = actors;
 	}
 
+	public String getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(String language) {
+		this.language = language;
+	}
+
 	@Override
 	public int hashCode() {
-		return Objects.hash(actors, description, id, languageID, length, rating, releaseYear, rentalDuration,
+		return Objects.hash(actors, description, id, language, languageID, length, rating, releaseYear, rentalDuration,
 				rentalRate, replacementCost, specialFeatures, title);
 	}
 
@@ -151,8 +160,9 @@ public class Film {
 			return false;
 		Film other = (Film) obj;
 		return Objects.equals(actors, other.actors) && Objects.equals(description, other.description) && id == other.id
-				&& languageID == other.languageID && length == other.length && Objects.equals(rating, other.rating)
-				&& releaseYear == other.releaseYear && rentalDuration == other.rentalDuration
+				&& Objects.equals(language, other.language) && languageID == other.languageID && length == other.length
+				&& Objects.equals(rating, other.rating) && releaseYear == other.releaseYear
+				&& rentalDuration == other.rentalDuration
 				&& Double.doubleToLongBits(rentalRate) == Double.doubleToLongBits(other.rentalRate)
 				&& Double.doubleToLongBits(replacementCost) == Double.doubleToLongBits(other.replacementCost)
 				&& Objects.equals(specialFeatures, other.specialFeatures) && Objects.equals(title, other.title);
@@ -160,10 +170,10 @@ public class Film {
 
 	@Override
 	public String toString() {
-		return "\nFilm [id=" + id + ",\n title=" + title + ",\n description=" + description + ",\n releaseYear=" + releaseYear
-				+ ",\n languageID=" + languageID + ",\n rentalDuration=" + rentalDuration + ",\n rentalRate=" + rentalRate
-				+ ",\n length=" + length + ",\n replacementCost=" + replacementCost + ",\n rating=" + rating
-				+ ",\n specialFeatures=" + specialFeatures + "]";
+		return "Film [id=" + id + ", title=" + title + ", description=" + description + ", releaseYear=" + releaseYear
+				+ ", languageID=" + languageID + ", rentalDuration=" + rentalDuration + ", rentalRate=" + rentalRate
+				+ ", length=" + length + ", replacementCost=" + replacementCost + ", rating=" + rating
+				+ ", specialFeatures=" + specialFeatures + ", actors=" + actors + ", language=" + language + "]";
 	}
 
 }
