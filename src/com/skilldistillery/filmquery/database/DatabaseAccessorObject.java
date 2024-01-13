@@ -61,7 +61,7 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 			ResultSet results = statement.executeQuery();
 			while (results.next()) {
 				Film film;
-				// DO NOT USE constructFilm() BECAUSE IT WILL RESULT IN RECURSIVE CALLS
+				// DO NOT USE constructFilm() BECAUSE IT WILL RESULT IN RECURSIVE CALLS FROM findActorsByFilmId()
 				film = new Film(results.getInt("id"), results.getString("title"), results.getString("description"),
 						results.getShort("release_year"), results.getInt("language_id"),
 						results.getInt("rental_duration"), results.getDouble("rental_rate"), results.getInt("length"),
@@ -91,7 +91,12 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 			statement.setString(2, "%" + keyword + "%");
 			ResultSet results = statement.executeQuery();
 			while (results.next()) {
-				Film film = constructFilm(results);
+				Film film = new Film(results.getInt("id"), results.getString("title"), results.getString("description"),
+						results.getShort("release_year"), results.getInt("language_id"),
+						results.getInt("rental_duration"), results.getDouble("rental_rate"), results.getInt("length"),
+						results.getDouble("replacement_cost"), results.getString("rating"),
+						results.getString("special_features"), findActorsByFilmId(results.getInt("id")));
+				film.setLanguage(findFilmLanguage(results.getInt("id")));
 				films.add(film);
 			}
 			statement.close();
